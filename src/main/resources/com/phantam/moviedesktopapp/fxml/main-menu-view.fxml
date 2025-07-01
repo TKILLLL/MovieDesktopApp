@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Hyperlink?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.FlowPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+<?import org.kordamp.ikonli.javafx.FontIcon?>
+
+<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1300.0" style="-fx-background-color: #222731;" stylesheets="@../css/main-menu.css" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.phantam.moviedesktopapp.Controller.MainViewController">
+   <children>
+      <Pane prefHeight="800.0" prefWidth="285.0" style="-fx-background-color: #15161B;">
+         <children>
+            <Button layoutX="64.0" layoutY="60.0" mnemonicParsing="false" prefHeight="62.0" prefWidth="158.0" styleClass="logo" stylesheets="@../css/main-menu.css" text="HD" textFill="#2e73c6">
+               <graphic>
+                  <Label text="Phantam" textFill="WHITE">
+                     <font>
+                        <Font size="20.0" />
+                     </font>
+                  </Label>
+               </graphic>
+               <font>
+                  <Font size="23.0" />
+               </font>
+            </Button>
+            <VBox layoutX="30.0" layoutY="236.0" prefHeight="523.0" prefWidth="220.0">
+               <children>
+                  <VBox prefHeight="200.0" prefWidth="100.0" spacing="5.0">
+                     <children>
+                        <Label text="Main" textFill="WHITE" />
+                        <Button fx:id="popularBtn" mnemonicParsing="false" styleClass="option-button" stylesheets="@../css/main-menu.css" text="Popular" />
+                        <Button fx:id="topRateBtn" mnemonicParsing="false" styleClass="option-button" stylesheets="@../css/main-menu.css" text="Top Rate" />
+                        <Button fx:id="upComingBtn" mnemonicParsing="false" styleClass="option-button" stylesheets="@../css/main-menu.css" text="Upcoming" />
+                        <Button mnemonicParsing="false" styleClass="option-button" stylesheets="@../css/main-menu.css" text="Downloaded" />
+                        <Button mnemonicParsing="false" styleClass="option-button" stylesheets="@../css/main-menu.css" text="My Collections" />
+                     </children>
+                  </VBox>
+                  <VBox prefHeight="200.0" prefWidth="100.0" spacing="5.0">
+                     <children>
+                        <Label text="Genre" textFill="WHITE" />
+                        <Button mnemonicParsing="false" styleClass="option-button" stylesheets="@../css/main-menu.css" text="Action" />
+                        <Button mnemonicParsing="false" styleClass="option-button" stylesheets="@../css/main-menu.css" text="Drama" />
+                        <Button mnemonicParsing="false" styleClass="option-button" stylesheets="@../css/main-menu.css" text="Honor" />
+                        <Button mnemonicParsing="false" styleClass="option-button" stylesheets="@../css/main-menu.css" text="Adventure" />
+                        <Button mnemonicParsing="false" styleClass="option-button" stylesheets="@../css/main-menu.css" text="Documentary" />
+                     </children>
+                     <VBox.margin>
+                        <Insets top="10.0" />
+                     </VBox.margin>
+                  </VBox>
+               </children>
+            </VBox>
+            <FontIcon fx:id="exitIcon" iconColor="WHITE" iconLiteral="fas-times" iconSize="21" layoutX="22.0" layoutY="33.0" wrappingWidth="11.188659173717042">
+               <font>
+                  <Font size="21.0" />
+               </font>
+            </FontIcon>
+            <FontIcon fx:id="miniIcon" iconColor="WHITE" iconLiteral="fas-window-minimize" iconSize="21" layoutX="63.0" layoutY="30.0">
+               <font>
+                  <Font size="21.0" />
+               </font>
+            </FontIcon>
+         </children>
+      </Pane>
+      <ChoiceBox layoutX="329.0" layoutY="29.0" prefHeight="30.0" prefWidth="200.0" style="-fx-background-color: #15161B;" styleClass="category" stylesheets="@../css/main-menu.css" />
+      <TextField layoutX="990.0" layoutY="29.0" prefHeight="30.0" prefWidth="190.0" promptText="Search movie" style="-fx-background-color: #15161B;" styleClass="search" stylesheets="@../css/main-menu.css" />
+      <Button layoutX="1220.0" layoutY="24.0" mnemonicParsing="false" prefHeight="40.0" prefWidth="40.0" style="-fx-background-color: transparent; -fx-background-radius: 50%;" styleClass="profile" stylesheets="@../css/main-menu.css">
+         <graphic>
+            <ImageView fitHeight="30.0" fitWidth="30.0" pickOnBounds="true" preserveRatio="true" />
+         </graphic>
+      </Button>
+       <ScrollPane fx:id="listMovieContainer" layoutX="310.0" layoutY="80.0" prefHeight="668.0" prefWidth="967.0" style="-fx-background-color: #222731;" styleClass="scroll-bar" stylesheets="@../css/main-menu.css">
+           <content>
+               <FlowPane fx:id="listMovie" hgap="15" prefHeight="668.0" prefWidth="967.0" prefWrapLength="967.0" style="-fx-background-color: transparent;" vgap="20">
+               <padding>
+                  <Insets top="10.0" />
+               </padding></FlowPane>
+           </content>
+       </ScrollPane>
+      <HBox alignment="CENTER" layoutX="689.0" layoutY="758.0" prefHeight="38.0" prefWidth="213.0" spacing="10.0">
+         <children>
+            <Button fx:id="btnPrev" mnemonicParsing="false" style="-fx-background-color: #15161B; -fx-background-radius: 8px;" text="Prev" textFill="WHITE" />
+            <Hyperlink fx:id="hlPagePrev" text="1" textFill="WHITE" />
+            <Hyperlink fx:id="hlPage" text="2" textFill="WHITE" />
+            <Hyperlink fx:id="hlPageNext" text="3" textFill="WHITE" />
+            <Button fx:id="btnNext" mnemonicParsing="false" style="-fx-background-color: #15161B; -fx-background-radius: 8px;" text="Next" textFill="WHITE" />
+         </children>
+      </HBox>
+
+      <!-- Detail content -->
+      <Pane fx:id="movieDetailContainer" layoutX="285.0" prefHeight="800.0" prefWidth="1015.0" style="-fx-background-color: linear-gradient(to bottom, #3a003f, #0c2e35);">
+         <children>
+            <ImageView fx:id="posterImageView" fitHeight="270" fitWidth="180" layoutX="744.0" layoutY="65.0" />
+
+            <Label fx:id="lblTitle" layoutX="368.0" layoutY="51.0" style="-fx-text-fill: white;" text="Avengers">
+               <font>
+                  <Font size="28" />
+               </font>
+            </Label>
+            <HBox fx:id="hboxStarContaier" alignment="CENTER" layoutX="129.0" layoutY="64.0" prefHeight="49.0" prefWidth="158.0" styleClass="-fx-icon-color: white; -fx-font-weight: bold;" />
+            <Label layoutX="147.0" layoutY="127.0" style="-fx-text-fill: white; -fx-font-weight: bold;" text="GENRE" />
+
+            <VBox fx:id="genreListVbox" layoutX="150.0" layoutY="144.0" prefHeight="87.0" prefWidth="180.0" spacing="5" />
+            <Label layoutX="150.0" layoutY="237.0" prefWidth="61.0" style="-fx-text-fill: white; -fx-font-weight: bold;" text="DIRECTOR" />
+
+            <VBox fx:id="directorListVbox" layoutX="150.0" layoutY="254.0" prefHeight="49.0" prefWidth="180.0" spacing="5" />
+            <Label layoutX="147.0" layoutY="310.0" prefWidth="67.0" style="-fx-text-fill: white; -fx-font-weight: bold;" text="PRODUCER" />
+
+            <VBox fx:id="producerListVbox" layoutX="150.0" layoutY="327.0" prefHeight="138.0" prefWidth="180.0" spacing="5" />
+            <VBox layoutX="369.0" layoutY="100.0" prefHeight="333.0" prefWidth="343.0" spacing="8.0">
+               <children>
+
+                  <Label fx:id="lblMetaInfo" style="-fx-text-fill: white;" text="1 h 47 min, 2019" />
+
+                  <Label fx:id="lblOverview" prefWidth="300" style="-fx-text-fill: white;" text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Arcu a lectus laoreet ipsum at sed. Porta" wrapText="true" />
+
+                  <HBox spacing="10">
+                     <children>
+                        <Button fx:id="btnTrailer" style="-fx-background-color: #2d3e50; -fx-text-fill: white; -fx-padding: 8 16;" text="Trailer" />
+                        <Button style="-fx-background-color: white; -fx-text-fill: black; -fx-padding: 8 16;" text="Play" />
+                     </children>
+                     <VBox.margin>
+                        <Insets top="10.0" />
+                     </VBox.margin>
+                  </HBox>
+               </children>
+            </VBox>
+            <ScrollPane fx:id="actorContainer" layoutX="153.0" layoutY="516.0" prefHeight="200.0" prefWidth="780.0">
+               <content>
+      
+                        <HBox fx:id="actorContainerList" alignment="CENTER_LEFT" prefHeight="200.0" prefWidth="780.0" spacing="50" />
+               </content>
+            </ScrollPane>
+            <FontIcon fx:id="backIcon" iconColor="WHITE" iconLiteral="fas-long-arrow-alt-left" iconSize="21" layoutX="43.0" layoutY="31.0" wrappingWidth="18.986088609202397">
+               <font>
+                  <Font size="21.0" />
+               </font>
+            </FontIcon>
+            <Label layoutX="124.0" layoutY="468.0" prefHeight="30.0" prefWidth="164.0" text="Top Billed Cast" textFill="WHITE">
+               <font>
+                  <Font size="25.0" />
+               </font>
+            </Label>
+         </children>
+      </Pane>
+
+   </children>
+</AnchorPane>

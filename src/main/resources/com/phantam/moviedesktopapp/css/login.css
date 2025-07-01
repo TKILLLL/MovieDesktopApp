@@ -1,0 +1,35 @@
+.login-container {
+    -fx-alignment: center;
+}
+
+.login_background {
+    -fx-height: 100%;
+    -fx-width: 100%;
+    -fx-background-color: linear-gradient(to bottom right, #669FEC, #2E5EBE);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 10, 0, 0, 0);
+}
+
+.login_input {
+
+}
+
+.login_button {
+    -fx-background-color: #669FEC;
+    -fx-font-weight: bold;
+    -fx-text-alignment: center;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 10px 20px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+}
+
+.login_title-input {
+    -fx-opacity: 0.5;
+    -fx-font-weight: bold;
+}
+
+.login_title {
+    -fx-font-weight: bold;
+}

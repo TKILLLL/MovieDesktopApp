@@ -1,0 +1,52 @@
+.register_container {
+    -fx-height: 100%;
+    -fx-width: 100%;
+    -fx-background-color: linear-gradient(to bottom right, #669FEC, #2E5EBE);
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.8), 10, 0, 0, 0);
+}
+
+.register_form {
+    -fx-background-color: white;
+    -fx-background-radius: 10px;
+    -fx-effect: dropshadow(gaussian, #000000, 15, 0, 0.5, 2);
+}
+
+.register_container {
+    -fx-alignment: center;
+}
+
+.register_title {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333333;
+    -fx-padding: 20px 0;
+}
+
+.register_title-input {
+    -fx-font-weight: bold;
+}
+
+.register_container-item {
+
+}
+
+.register_button-back {
+    -fx-background-color: #ffffff;
+    -fx-font-weight: bold;
+    -fx-text-alignment: center;
+    -fx-text-fill: #669FEC;
+    -fx-font-size: 10px;
+    -fx-cursor: hand;
+}
+
+.register_button {
+    -fx-background-color: #669FEC;
+    -fx-font-weight: bold;
+    -fx-text-alignment: center;
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 10px 20px;
+    -fx-border-radius: 5px;
+    -fx-background-radius: 5px;
+    -fx-cursor: hand;
+}

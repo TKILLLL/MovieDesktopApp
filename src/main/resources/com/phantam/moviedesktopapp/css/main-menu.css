@@ -1,0 +1,80 @@
+.logo {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.option-button {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+    -fx-text-fill: #6D6D7A;
+    -fx-font-size: 14px;
+}
+
+.search {
+    -fx-text-fill: #6D6D7A;
+    -fx-font-size: 14px;
+}
+
+.category .search .profile {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.option-button:hover {
+    -fx-text-fill: #2e73c6;
+}
+
+.scroll-bar:vertical {
+    -fx-background-color: transparent;
+}
+
+.scroll-pane {
+    -fx-background-color: transparent;
+    -fx-background-insets: 0;
+    -fx-padding: 0;
+}
+
+.scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar:horizontal {
+    -fx-background-color: transparent;
+}
+
+.scroll-bar .thumb {
+    -fx-background-color: #888888;     /* Màu nút kéo */
+    -fx-background-radius: 5;
+}
+
+.scroll-bar .track {
+    -fx-background-color: #2a2a2a;     /* Màu nền thanh cuộn */
+}
+
+.scroll-bar .increment-button,
+.scroll-bar .decrement-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0;
+}
+
+.movie-card {
+    -fx-background-color: #1e1e1e;
+    -fx-border-radius: 8px;
+    -fx-background-radius: 8px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0.5, 0, 2);
+}
+
+.movie-title {
+    -fx-font-size: 16px;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+}
+
+.movie-rate {
+    -fx-text-fill: yellow;
+    -fx-font-weight: bold;
+}
+
+.movie-runtime {
+    -fx-text-fill: lightgray;
+}
