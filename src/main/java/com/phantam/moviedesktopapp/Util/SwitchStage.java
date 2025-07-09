@@ -1,7 +1,6 @@
 package com.phantam.moviedesktopapp.Util;
 
 import com.phantam.moviedesktopapp.App.Main;
-import com.phantam.moviedesktopapp.Model.Movie;
 import javafx.event.Event;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
@@ -19,9 +18,9 @@ public class SwitchStage {
     /**
      * Chuyển sang Stage mới với FXML tương ứng.
      *
-     * @param event Sự kiện (ActionEvent, MouseEvent...) để lấy Stage hiện tại.
-     * @param fxmlPath Đường dẫn FXML.
-     * @param title Tiêu đề Stage mới.
+     * @param event       Sự kiện (ActionEvent, MouseEvent...) để lấy Stage hiện tại.
+     * @param fxmlPath    Đường dẫn FXML.
+     * @param title       Tiêu đề Stage mới.
      * @param undecorated Có bỏ viền cửa sổ hay không.
      */
     public void switchToStage(Event event, String fxmlPath, String title, boolean undecorated) {
@@ -56,8 +55,8 @@ public class SwitchStage {
     /**
      * Chuyển sang Stage mới với FXML tương ứng.
      *
-     * @param fxmlPath Đường dẫn FXML.
-     * @param title Tiêu đề Stage mới.
+     * @param fxmlPath    Đường dẫn FXML.
+     * @param title       Tiêu đề Stage mới.
      * @param undecorated Có bỏ viền cửa sổ hay không.
      */
     public <T> T switchToStage(String fxmlPath, String title, boolean undecorated) {

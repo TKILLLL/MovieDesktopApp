@@ -133,6 +133,7 @@ public class LoginController {
     protected void onExitButtonClicked() {
         System.exit(0);
     }
+
     @FXML
     protected void onMiniButtonClicked() {
         Stage stage = (Stage) minimizeButton.getScene().getWindow();

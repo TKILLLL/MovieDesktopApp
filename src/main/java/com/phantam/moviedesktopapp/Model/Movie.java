@@ -54,6 +54,8 @@ public class Movie {
         return voteAverage;
     }
 
-    public String getGenres() {return genres;}
+    public String getGenres() {
+        return genres;
+    }
 }
 

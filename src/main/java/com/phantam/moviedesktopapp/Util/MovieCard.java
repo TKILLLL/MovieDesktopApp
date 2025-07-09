@@ -9,10 +9,12 @@ import javafx.scene.control.Label;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.util.Duration;
-import org.w3c.dom.events.MouseEvent;
 
 public class MovieCard extends VBox {
 
@@ -22,6 +24,7 @@ public class MovieCard extends VBox {
 
     /**
      * Tạo một MovieCard hiển thị thông tin của một bộ phim.
+     *
      * @param movie Đối tượng Movie chứa thông tin phim.
      */
     public MovieCard(Movie movie, MainViewController controller) {

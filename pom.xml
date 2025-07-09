@@ -63,7 +63,7 @@
             <version>0.4</version>
         </dependency>
 
-<!--        Gửi mail đến user-->
+        <!--        Gửi mail đến user-->
         <dependency>
             <groupId>com.sun.mail</groupId>
             <artifactId>jakarta.mail</artifactId>

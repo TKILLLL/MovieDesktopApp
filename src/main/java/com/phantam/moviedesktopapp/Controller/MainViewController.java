@@ -7,14 +7,8 @@ import com.phantam.moviedesktopapp.Util.MovieCard;
 import com.phantam.moviedesktopapp.Util.SwitchStage;
 import javafx.animation.TranslateTransition;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.geometry.Pos;
-import javafx.scene.Parent;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Hyperlink;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
+import javafx.scene.control.*;
 import javafx.scene.effect.DropShadow;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -24,13 +18,11 @@ import javafx.scene.layout.Pane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
-import javafx.stage.Stage;
-import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import org.kordamp.ikonli.javafx.FontIcon;
 
-import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 public class MainViewController {
 
@@ -40,12 +32,20 @@ public class MainViewController {
     /**
      * Movie List Content
      */
-    @FXML private FlowPane listMovie;
-    @FXML private ScrollPane listMovieContainer;
-    @FXML private Hyperlink hlPage, hlPagePrev, hlPageNext;
-    @FXML private Button btnPrev, btnNext;
+    @FXML
+    private FlowPane listMovie;
+    @FXML
+    private ScrollPane listMovieContainer;
+    @FXML
+    private Hyperlink hlPage, hlPagePrev, hlPageNext;
+    @FXML
+    private Button btnPrev, btnNext;
 
-    @FXML private Button upComingBtn, popularBtn, topRateBtn;
+    @FXML
+    private Button upComingBtn, popularBtn, topRateBtn,
+            actionBtn, dramaBtn, honorBtn, adventureBtn, documentaryBtn;
+    @FXML
+    private ChoiceBox genreChoiceBox;
 
     private int currentPage = 1;
     private MovieCategory currentCategory = MovieCategory.POPULAR;
@@ -53,21 +53,39 @@ public class MainViewController {
     /**
      * Movie Detail Content
      */
-    @FXML private Pane movieDetailContainer;
+    @FXML
+    private Pane movieDetailContainer;
 
-    @FXML private ImageView posterImageView;
-    @FXML private Label lblTitle;
-    @FXML private Label lblMetaInfo;
-    @FXML private Label lblOverview;
-    @FXML private HBox hboxStarContaier;
-    @FXML private FontIcon backIcon, exitIcon, miniIcon;
-    @FXML private VBox producerListVbox, directorListVbox, genreListVbox;
-    @FXML private HBox actorContainerList;
-    @FXML private ScrollPane actorContainer;
-    @FXML private Button btnTrailer;
+    @FXML
+    private ImageView posterImageView;
+    @FXML
+    private Label lblTitle;
+    @FXML
+    private Label lblMetaInfo;
+    @FXML
+    private Label lblOverview;
+    @FXML
+    private HBox hboxStarContaier;
+    @FXML
+    private FontIcon backIcon, exitIcon, miniIcon;
+    @FXML
+    private VBox producerListVbox, directorListVbox, genreListVbox;
+    @FXML
+    private HBox actorContainerList;
+    @FXML
+    private ScrollPane actorContainer;
+    @FXML
+    private Button btnTrailer;
 
     public Pane getMovieDetailContainer() {
         return movieDetailContainer;
+    }
+
+    /**
+     * Enum để xác định các thể loại phim.
+     */
+    public enum MovieCategory {
+        POPULAR, UPCOMING, TOP_RATED
     }
 
     /**
@@ -75,7 +93,11 @@ public class MainViewController {
      */
     @FXML
     public void initialize() {
+
         movieDetailContainer.setVisible(false);
+
+        genreChoiceBoxLoad();
+
 
         // Hover animation
         animationButton(btnNext);
@@ -128,34 +150,121 @@ public class MainViewController {
         });
 
         // Thiết lập sự kiện cho các nút thể loại phim
+        categoryLoad();
+
+        // Thiết lập sự kiện cho các thể loại phim
+        genreLoad();
+
+    }
+
+    private void genreChoiceBoxLoad() {
+        Map<Integer, String> genreMap = TMDbService.fetchGenreMap(); // ID -> Name
+        genreChoiceBox.getItems().addAll(genreMap.values()); // Hiển thị tên genre
+
+        genreChoiceBox.setOnAction(e -> {
+            String selectedGenreName = genreChoiceBox.getValue().toString(); // Lấy tên được chọn
+
+            // Tìm ID tương ứng với tên
+            int genreId = genreMap.entrySet().stream()
+                    .filter(entry -> entry.getValue().equals(selectedGenreName))
+                    .map(Map.Entry::getKey)
+                    .findFirst()
+                    .orElse(-1); // Không tìm thấy
+
+            if (genreId != -1) {
+                List<Movie> movies = TMDbService.fetchGenreFormCategoryMovies(1, genreId);
+                listMovie.getChildren().clear(); // Xóa phim cũ
+                for (Movie movie : movies) {
+                    listMovie.getChildren().add(new MovieCard(movie, this));
+                }
+            }
+        });
+
+    }
+
+    /**
+     * Thiết lập sự kiện cho các nút thể loại phim.
+     * Khi người dùng nhấn vào một nút, sẽ tải lại danh sách phim theo thể loại tương ứng.
+     */
+    private void genreLoad() {
+        actionBtn.setOnAction(e -> {
+            if (movieDetailContainer.isVisible()) {
+                animateHideMovieDetail();
+            }
+            currentCategory = MovieCategory.POPULAR;
+            currentPage = 1;
+            loadMoviesByGenre(28, currentPage); // 28 là ID của thể loại Action
+        });
+        dramaBtn.setOnAction(e -> {
+            if (movieDetailContainer.isVisible()) {
+                animateHideMovieDetail();
+            }
+            currentCategory = MovieCategory.POPULAR;
+            currentPage = 1;
+            loadMoviesByGenre(18, currentPage); // 18 là ID của thể loại Drama
+        });
+        honorBtn.setOnAction(e -> {
+            if (movieDetailContainer.isVisible()) {
+                animateHideMovieDetail();
+            }
+            currentCategory = MovieCategory.POPULAR;
+            currentPage = 1;
+            loadMoviesByGenre(10751, currentPage); // 10751 là ID của thể loại Family
+        });
+        adventureBtn.setOnAction(e -> {
+            if (movieDetailContainer.isVisible()) {
+                animateHideMovieDetail();
+            }
+            currentCategory = MovieCategory.POPULAR;
+            currentPage = 1;
+            loadMoviesByGenre(12, currentPage); // 12 là ID của thể loại Adventure
+        });
+        documentaryBtn.setOnAction(e -> {
+            if (movieDetailContainer.isVisible()) {
+                animateHideMovieDetail();
+            }
+            currentCategory = MovieCategory.POPULAR;
+            currentPage = 1;
+            loadMoviesByGenre(99, currentPage); // 99 là ID của thể loại Documentary
+        });
+    }
+
+    /**
+     * Thiết lập sự kiện cho các nút thể loại phim.
+     * Khi người dùng nhấn vào một nút, sẽ tải lại danh sách phim theo thể loại tương ứng.
+     */
+    private void categoryLoad() {
         upComingBtn.setOnAction(e -> {
-            if (movieDetailContainer.isVisible()) { animateHideMovieDetail(); }
+            if (movieDetailContainer.isVisible()) {
+                animateHideMovieDetail();
+            }
             currentCategory = MovieCategory.UPCOMING;
             currentPage = 1;
             loadPage(currentCategory, currentPage);
         });
         popularBtn.setOnAction(e -> {
-            if (movieDetailContainer.isVisible()) { animateHideMovieDetail(); }
+            if (movieDetailContainer.isVisible()) {
+                animateHideMovieDetail();
+            }
             currentCategory = MovieCategory.POPULAR;
             currentPage = 1;
             loadPage(currentCategory, currentPage);
         });
         topRateBtn.setOnAction(e -> {
-            if (movieDetailContainer.isVisible()) { animateHideMovieDetail(); }
+            if (movieDetailContainer.isVisible()) {
+                animateHideMovieDetail();
+            }
             currentCategory = MovieCategory.TOP_RATED;
             currentPage = 1;
             loadPage(currentCategory, currentPage);
         });
     }
 
-    public enum MovieCategory {
-        POPULAR, UPCOMING, TOP_RATED
-    }
-
 
     /**
      * Tải danh sách phim cho trang hiện tại.
-     * @param page Số trang cần tải.
+     *
+     * @param page     Số trang cần tải.
      * @param category Thể loại phim (POPULAR, UPCOMING, ...).
      */
     private void loadPage(MovieCategory category, int page) {
@@ -171,7 +280,29 @@ public class MainViewController {
     }
 
     /**
+     * Tải danh sách phim theo thể loại.
+     *
+     * @param genreId ID của thể loại phim.
+     * @param page    Số trang cần tải.
+     */
+    private void loadMoviesByGenre(int genreId, int page) {
+        listMovie.getChildren().clear();
+        currentPage = page;
+
+        List<Movie> movies = TMDbService.fetchMoviesByGenre(genreId, page);
+        for (Movie movie : movies) {
+            listMovie.getChildren().add(new MovieCard(movie, this));
+        }
+
+        hlPage.setText(String.valueOf(page));
+        hlPagePrev.setText(String.valueOf(page - 1));
+        hlPageNext.setText(String.valueOf(page + 1));
+    }
+
+
+    /**
      * Hiệu ứng hover cho nút và liên kết.
+     *
      * @param button Nút cần áp dụng hiệu ứng.
      */
     private void animationButton(Button button) {
@@ -181,6 +312,7 @@ public class MainViewController {
 
     /**
      * Hiệu ứng hover cho liên kết.
+     *
      * @param hyperlink Liên kết cần áp dụng hiệu ứng.
      */
     private void animationHyperlink(Hyperlink hyperlink) {
@@ -190,6 +322,7 @@ public class MainViewController {
 
     /**
      * Thiết lập thông tin chi tiết của bộ phim.
+     *
      * @param movie Đối tượng Movie chứa thông tin phim.
      */
     public void setMovie(Movie movie) {
@@ -266,6 +399,7 @@ public class MainViewController {
 
     /**
      * Tạo một HBox chứa các biểu tượng sao dựa trên số điểm đánh giá.
+     *
      * @param stars Số điểm đánh giá (từ 0 đến 10).
      * @return HBox chứa các biểu tượng sao.
      */
@@ -309,7 +443,7 @@ public class MainViewController {
      * Hiệu ứng ẩn chi tiết phim.
      * Trượt ra bên phải.
      */
-    private void animateHideMovieDetail() {
+    public void animateHideMovieDetail() {
         TranslateTransition slideOut = new TranslateTransition(Duration.millis(300), movieDetailContainer);
         slideOut.setFromX(0);
         slideOut.setToX(movieDetailContainer.getWidth());

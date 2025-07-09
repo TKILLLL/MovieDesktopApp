@@ -1,15 +1,11 @@
 package com.phantam.moviedesktopapp.App;
 
-import com.phantam.moviedesktopapp.Controller.MainViewController;
 import com.phantam.moviedesktopapp.Database.CustomerDatabase;
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Node;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-
-import java.util.Objects;
 
 public class Main extends Application {
 
@@ -18,11 +14,13 @@ public class Main extends Application {
 
     /**
      * Lấy Stage chính của ứng dụng.
+     *
      * @return Stage chính.
      */
     public static Stage getPrimaryStage() {
         return primaryStage;
     }
+
     public static void setPrimaryStage(Stage stage) {
         primaryStage = stage;
     }
