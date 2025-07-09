@@ -27,11 +27,7 @@ import java.util.Map;
 public class MainViewController {
 
     private final SwitchStage switchStage = new SwitchStage();
-    private final TrailerMovieDisplay trailerMovieDisplay = new TrailerMovieDisplay();
 
-    /**
-     * Movie List Content
-     */
     @FXML
     private FlowPane listMovie;
     @FXML
@@ -40,73 +36,58 @@ public class MainViewController {
     private Hyperlink hlPage, hlPagePrev, hlPageNext;
     @FXML
     private Button btnPrev, btnNext;
-
     @FXML
-    private Button upComingBtn, popularBtn, topRateBtn,
-            actionBtn, dramaBtn, honorBtn, adventureBtn, documentaryBtn;
+    private Button upComingBtn, popularBtn, topRateBtn;
     @FXML
-    private ChoiceBox genreChoiceBox;
+    private Button actionBtn, dramaBtn, honorBtn, adventureBtn, documentaryBtn;
+    @FXML
+    private ChoiceBox<String> genreChoiceBox;
 
-    private int currentPage = 1;
-    private MovieCategory currentCategory = MovieCategory.POPULAR;
-
-    /**
-     * Movie Detail Content
-     */
     @FXML
     private Pane movieDetailContainer;
-
     @FXML
     private ImageView posterImageView;
     @FXML
-    private Label lblTitle;
+    private Label lblTitle, lblMetaInfo, lblOverview;
     @FXML
-    private Label lblMetaInfo;
-    @FXML
-    private Label lblOverview;
-    @FXML
-    private HBox hboxStarContaier;
+    private HBox hboxStarContaier, actorContainerList;
     @FXML
     private FontIcon backIcon, exitIcon, miniIcon;
     @FXML
     private VBox producerListVbox, directorListVbox, genreListVbox;
     @FXML
-    private HBox actorContainerList;
-    @FXML
     private ScrollPane actorContainer;
     @FXML
     private Button btnTrailer;
+
+    private int currentPage = 1;
+    private MovieCategory currentCategory = MovieCategory.POPULAR;
 
     public Pane getMovieDetailContainer() {
         return movieDetailContainer;
     }
 
     /**
-     * Enum để xác định các thể loại phim.
+     * Enum representing the different movie categories.
+     * Used to filter and load movies based on user selection.
      */
-    public enum MovieCategory {
-        POPULAR, UPCOMING, TOP_RATED
-    }
+    public enum MovieCategory {POPULAR, UPCOMING, TOP_RATED}
 
     /**
-     * Khởi tạo controller, thiết lập các thành phần giao diện và sự kiện.
+     * Initializes the main view controller.
+     * Sets up the UI components, loads initial movie categories and genres,
+     * and configures event handlers for pagination and genre selection.
      */
     @FXML
     public void initialize() {
-
         movieDetailContainer.setVisible(false);
 
-        genreChoiceBoxLoad();
-
-
-        // Hover animation
         animationButton(btnNext);
         animationButton(btnPrev);
         animationHyperlink(hlPage);
         animationHyperlink(hlPagePrev);
         animationHyperlink(hlPageNext);
 
-        // Cấu hình scroll
         listMovieContainer.setFitToWidth(true);
         listMovieContainer.setHbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         listMovieContainer.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
@@ -117,156 +98,95 @@ public class MainViewController {
         listMovie.setAlignment(Pos.CENTER);
         listMovie.setStyle("-fx-background-color: #222731;");
 
-        // Load trang đầu tiên
         loadPage(currentCategory, currentPage);
 
-        // Nút điều hướng
-        btnNext.setOnAction(e -> {
-            currentPage++;
-            loadPage(currentCategory, currentPage);
-        });
-
+        btnNext.setOnAction(e -> loadPage(currentCategory, ++currentPage));
         btnPrev.setOnAction(e -> {
-            if (currentPage > 1) {
-                currentPage--;
-                loadPage(currentCategory, currentPage);
-            }
+            if (currentPage > 1) loadPage(currentCategory, --currentPage);
         });
 
-        // Thiết lập sự kiện cho các liên kết và nút
         hlPage.setOnAction(e -> loadPage(currentCategory, currentPage));
         hlPagePrev.setOnAction(e -> {
             if (currentPage > 1) loadPage(currentCategory, currentPage - 1);
         });
         hlPageNext.setOnAction(e -> loadPage(currentCategory, currentPage + 1));
 
-        exitIcon.setOnMouseClicked(e -> {
-            System.exit(0);
-        });
-        miniIcon.setOnMouseClicked(e -> {
-            if (movieDetailContainer.getScene() != null) {
-                movieDetailContainer.getScene().getWindow();
-            }
-        });
+        exitIcon.setOnMouseClicked(e -> System.exit(0));
 
-        // Thiết lập sự kiện cho các nút thể loại phim
         categoryLoad();
-
-        // Thiết lập sự kiện cho các thể loại phim
         genreLoad();
-
     }
 
-    private void genreChoiceBoxLoad() {
-        Map<Integer, String> genreMap = TMDbService.fetchGenreMap(); // ID -> Name
-        genreChoiceBox.getItems().addAll(genreMap.values()); // Hiển thị tên genre
+    // Setup the genre filter for the movie list
+    private void setupGenreFilter(List<Movie> allMovies) {
+        Map<Integer, String> genreMap = TMDbService.fetchGenreMap();
+        genreChoiceBox.getItems().setAll("Tất cả");
+        genreChoiceBox.getItems().addAll(genreMap.values());
+        genreChoiceBox.setValue("Tất cả");
 
         genreChoiceBox.setOnAction(e -> {
-            String selectedGenreName = genreChoiceBox.getValue().toString(); // Lấy tên được chọn
+            String selected = genreChoiceBox.getValue();
+            listMovie.getChildren().clear();
 
-            // Tìm ID tương ứng với tên
-            int genreId = genreMap.entrySet().stream()
-                    .filter(entry -> entry.getValue().equals(selectedGenreName))
-                    .map(Map.Entry::getKey)
-                    .findFirst()
-                    .orElse(-1); // Không tìm thấy
-
-            if (genreId != -1) {
-                List<Movie> movies = TMDbService.fetchGenreFormCategoryMovies(1, genreId);
-                listMovie.getChildren().clear(); // Xóa phim cũ
-                for (Movie movie : movies) {
-                    listMovie.getChildren().add(new MovieCard(movie, this));
-                }
+            if ("Tất cả".equals(selected)) {
+                allMovies.forEach(m -> listMovie.getChildren().add(new MovieCard(m, this)));
+            } else {
+                genreMap.entrySet().stream()
+                        .filter(entry -> entry.getValue().equals(selected))
+                        .findFirst()
+                        .ifPresent(entry -> allMovies.stream()
+                                .filter(m -> m.getGenreIds().contains(entry.getKey()))
+                                .forEach(m -> listMovie.getChildren().add(new MovieCard(m, this))));
             }
         });
-
     }
 
-    /**
-     * Thiết lập sự kiện cho các nút thể loại phim.
-     * Khi người dùng nhấn vào một nút, sẽ tải lại danh sách phim theo thể loại tương ứng.
-     */
+    // Load the genre buttons and set up their actions
     private void genreLoad() {
-        actionBtn.setOnAction(e -> {
-            if (movieDetailContainer.isVisible()) {
-                animateHideMovieDetail();
-            }
+        setupGenreButton(actionBtn, 28);
+        setupGenreButton(dramaBtn, 18);
+        setupGenreButton(honorBtn, 10751);
+        setupGenreButton(adventureBtn, 12);
+        setupGenreButton(documentaryBtn, 99);
+    }
+
+    /*
+     * Setup the genre buttons to load movies based on the selected genre
+     * @param btn The button to set up
+     * @param genreId The ID of the genre to load movies for
+     * @return void
+     * This method sets the action for the button to load movies of the specified genre
+     * when the button is clicked. It clears the current movie list,
+     * sets the current category to POPULAR,
+     * and loads the first page of movies for that genre.
+     */
+    private void setupGenreButton(Button btn, int genreId) {
+        btn.setOnAction(e -> {
+            if (movieDetailContainer.isVisible()) animateHideMovieDetail();
             currentCategory = MovieCategory.POPULAR;
             currentPage = 1;
-            loadMoviesByGenre(28, currentPage); // 28 là ID của thể loại Action
-        });
-        dramaBtn.setOnAction(e -> {
-            if (movieDetailContainer.isVisible()) {
-                animateHideMovieDetail();
-            }
-            currentCategory = MovieCategory.POPULAR;
-            currentPage = 1;
-            loadMoviesByGenre(18, currentPage); // 18 là ID của thể loại Drama
-        });
-        honorBtn.setOnAction(e -> {
-            if (movieDetailContainer.isVisible()) {
-                animateHideMovieDetail();
-            }
-            currentCategory = MovieCategory.POPULAR;
-            currentPage = 1;
-            loadMoviesByGenre(10751, currentPage); // 10751 là ID của thể loại Family
-        });
-        adventureBtn.setOnAction(e -> {
-            if (movieDetailContainer.isVisible()) {
-                animateHideMovieDetail();
-            }
-            currentCategory = MovieCategory.POPULAR;
-            currentPage = 1;
-            loadMoviesByGenre(12, currentPage); // 12 là ID của thể loại Adventure
-        });
-        documentaryBtn.setOnAction(e -> {
-            if (movieDetailContainer.isVisible()) {
-                animateHideMovieDetail();
-            }
-            currentCategory = MovieCategory.POPULAR;
-            currentPage = 1;
-            loadMoviesByGenre(99, currentPage); // 99 là ID của thể loại Documentary
+            loadMoviesByGenre(genreId, currentPage);
         });
     }
 
-    /**
-     * Thiết lập sự kiện cho các nút thể loại phim.
-     * Khi người dùng nhấn vào một nút, sẽ tải lại danh sách phim theo thể loại tương ứng.
-     */
+    // Load the initial movie categories and set up their buttons
     private void categoryLoad() {
-        upComingBtn.setOnAction(e -> {
-            if (movieDetailContainer.isVisible()) {
-                animateHideMovieDetail();
-            }
-            currentCategory = MovieCategory.UPCOMING;
-            currentPage = 1;
-            loadPage(currentCategory, currentPage);
-        });
-        popularBtn.setOnAction(e -> {
-            if (movieDetailContainer.isVisible()) {
-                animateHideMovieDetail();
-            }
-            currentCategory = MovieCategory.POPULAR;
-            currentPage = 1;
-            loadPage(currentCategory, currentPage);
-        });
-        topRateBtn.setOnAction(e -> {
-            if (movieDetailContainer.isVisible()) {
-                animateHideMovieDetail();
-            }
-            currentCategory = MovieCategory.TOP_RATED;
+        setupCategoryButton(upComingBtn, MovieCategory.UPCOMING);
+        setupCategoryButton(popularBtn, MovieCategory.POPULAR);
+        setupCategoryButton(topRateBtn, MovieCategory.TOP_RATED);
+    }
+
+    // Setup the category buttons to load movies based on the selected category
+    private void setupCategoryButton(Button btn, MovieCategory category) {
+        btn.setOnAction(e -> {
+            if (movieDetailContainer.isVisible()) animateHideMovieDetail();
+            currentCategory = category;
             currentPage = 1;
             loadPage(currentCategory, currentPage);
         });
     }
 
-
-    /**
-     * Tải danh sách phim cho trang hiện tại.
-     *
-     * @param page     Số trang cần tải.
-     * @param category Thể loại phim (POPULAR, UPCOMING, ...).
-     */
+    // Load movies by category with pagination
     private void loadPage(MovieCategory category, int page) {
         listMovie.getChildren().clear();
         hlPage.setText(String.valueOf(page));
@@ -274,224 +194,151 @@ public class MainViewController {
         hlPageNext.setText(String.valueOf(page + 1));
 
         List<Movie> movies = TMDbService.fetchMoviesByCategory(category, page);
-        for (Movie movie : movies) {
-            listMovie.getChildren().add(new MovieCard(movie, this));
-        }
+        movies.forEach(m -> listMovie.getChildren().add(new MovieCard(m, this)));
+        setupGenreFilter(movies);
     }
 
-    /**
-     * Tải danh sách phim theo thể loại.
-     *
-     * @param genreId ID của thể loại phim.
-     * @param page    Số trang cần tải.
-     */
+    // Load movies by genre with pagination
     private void loadMoviesByGenre(int genreId, int page) {
         listMovie.getChildren().clear();
         currentPage = page;
-
         List<Movie> movies = TMDbService.fetchMoviesByGenre(genreId, page);
-        for (Movie movie : movies) {
-            listMovie.getChildren().add(new MovieCard(movie, this));
-        }
+        movies.forEach(m -> listMovie.getChildren().add(new MovieCard(m, this)));
 
         hlPage.setText(String.valueOf(page));
         hlPagePrev.setText(String.valueOf(page - 1));
         hlPageNext.setText(String.valueOf(page + 1));
     }
 
-
-    /**
-     * Hiệu ứng hover cho nút và liên kết.
-     *
-     * @param button Nút cần áp dụng hiệu ứng.
-     */
+    // Animate the button to change color on hover
     private void animationButton(Button button) {
         button.setOnMouseEntered(e -> button.setStyle("-fx-background-color: #3a3f4b; -fx-text-fill: white;"));
         button.setOnMouseExited(e -> button.setStyle("-fx-background-color: #222731; -fx-text-fill: white;"));
     }
 
-    /**
-     * Hiệu ứng hover cho liên kết.
-     *
-     * @param hyperlink Liên kết cần áp dụng hiệu ứng.
-     */
-    private void animationHyperlink(Hyperlink hyperlink) {
-        hyperlink.setOnMouseEntered(e -> hyperlink.setStyle("-fx-text-fill: #00bcd4; -fx-underline: true;"));
-        hyperlink.setOnMouseExited(e -> hyperlink.setStyle("-fx-text-fill: white; -fx-underline: false;"));
+    // Animate the hyperlink to change color and underline on hover
+    private void animationHyperlink(Hyperlink link) {
+        link.setOnMouseEntered(e -> link.setStyle("-fx-text-fill: #00bcd4; -fx-underline: true;"));
+        link.setOnMouseExited(e -> link.setStyle("-fx-text-fill: white; -fx-underline: false;"));
     }
 
-    /**
-     * Thiết lập thông tin chi tiết của bộ phim.
-     *
-     * @param movie Đối tượng Movie chứa thông tin phim.
-     */
+    // Set the movie details in the detail container
     public void setMovie(Movie movie) {
-        // Hiển thị phần chi tiết phim
         animateShowMovieDetail();
-
-        // Cấu hình scroll
         actorContainer.setFitToHeight(true);
         actorContainer.setHbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         actorContainer.setVbarPolicy(ScrollPane.ScrollBarPolicy.NEVER);
         actorContainer.setPannable(true);
-        actorContainer.setStyle("-fx-background-color: transparent;");
-        actorContainer.getContent().setStyle("-fx-background-color: transparent;");
 
-        // Tạo biểu tượng quay lại
-        backIcon.setOnMouseClicked(event -> animateHideMovieDetail());
+        backIcon.setOnMouseClicked(e -> animateHideMovieDetail());
         backIcon.setCursor(javafx.scene.Cursor.HAND);
-        backIcon.setAccessibleText("Quay lại danh sách phim");
-        HBox backContainer = new HBox(backIcon);
-        backContainer.setLayoutX(19);
-        backContainer.setLayoutY(13);
-        movieDetailContainer.getChildren().add(backContainer);
 
-        // Gán dữ liệu
         posterImageView.setImage(new Image(movie.getImageUrl(), true));
         lblTitle.setText(movie.getTitle());
-
-        hboxStarContaier.getChildren().clear();
-        hboxStarContaier.getChildren().add(generateStars(movie.getVoteAverage() / 2.0));
+        hboxStarContaier.getChildren().setAll(generateStars(movie.getVoteAverage() / 2.0));
 
         String year = movie.getReleaseDate().split("-")[0];
         int runtime = movie.getRunTime();
         lblMetaInfo.setText((runtime / 60) + " h " + (runtime % 60) + " min, " + year);
-
         lblOverview.setText(movie.getOverview());
 
-        // Thiết lập các đạo diễn, nhà sản xuất
         List<Actor> credits = TMDbService.fetchMovieCredits(movie.getId());
+        directorListVbox.getChildren().clear();
+        producerListVbox.getChildren().clear();
         for (Actor actor : credits) {
-            if ("Director".equalsIgnoreCase(actor.getRole()) && directorListVbox.getChildren().size() <= 2) {
+            if ("Director".equalsIgnoreCase(actor.getRole()) && directorListVbox.getChildren().size() <= 2)
                 addPersontoList(directorListVbox, actor.getName());
-            } else if ("Producer".equalsIgnoreCase(actor.getRole()) && producerListVbox.getChildren().size() <= 5) {
+            else if ("Producer".equalsIgnoreCase(actor.getRole()) && producerListVbox.getChildren().size() <= 5)
                 addPersontoList(producerListVbox, actor.getName());
-            }
         }
 
-        // Thiết lập thể loại
         genreListVbox.getChildren().clear();
-        String[] genres = movie.getGenres().split(",\\s*");
-        for (String genre : genres) {
+        for (String genre : movie.getGenres().split(",\\s*")) {
             addPersontoList(genreListVbox, genre);
         }
 
-        // Thiết lập diễn viên
         actorContainerList.getChildren().clear();
-        List<Actor> actors = TMDbService.fetchMovieCredits(movie.getId());
-        for (Actor actor : actors) {
+        for (Actor actor : credits) {
             if ("Actor".equalsIgnoreCase(actor.getRole()) && actorContainerList.getChildren().size() < 15) {
-                ImageView imageView = new ImageView(new Image(actor.getImageUrl(), true));
-                actorCard(actor.getName(), imageView);
+                actorCard(actor.getName(), new ImageView(new Image(actor.getImageUrl(), true)));
             }
         }
 
-        btnTrailer.setOnAction(event -> {
-            TrailerMovieDisplay trailerMovieDisplay = switchStage.switchToStage(
-                    "/com/phantam/moviedesktopapp/fxml/trailer-display-view.fxml", "", true
-            );
-            if (trailerMovieDisplay != null) {
-                trailerMovieDisplay.setMovieId(movie.getId());
-            }
+        btnTrailer.setOnAction(e -> {
+            TrailerMovieDisplay display = switchStage.switchToStage(
+                    "/com/phantam/moviedesktopapp/fxml/trailer-display-view.fxml", "", true);
+            if (display != null) display.setMovieId(movie.getId());
         });
     }
 
-
-    /**
-     * Tạo một HBox chứa các biểu tượng sao dựa trên số điểm đánh giá.
-     *
-     * @param stars Số điểm đánh giá (từ 0 đến 10).
-     * @return HBox chứa các biểu tượng sao.
-     */
+    // Generate star icons based on the rating
     private HBox generateStars(double stars) {
-        HBox starBox = new HBox(3);
+        HBox box = new HBox(3);
         int full = (int) stars;
-        boolean hasHalf = (stars - full) >= 0.5;
+        boolean half = (stars - full) >= 0.5;
 
-        for (int i = 0; i < full; i++) {
-            FontIcon icon = new FontIcon("fas-star");
-            icon.setStyle("-fx-font-size: 19px; -fx-icon-color: white;");
-            starBox.getChildren().add(icon);
-        }
-        if (hasHalf) {
-            FontIcon icon = new FontIcon("fas-star-half-alt");
-            icon.setStyle("-fx-font-size: 19px; -fx-icon-color: white;");
-            starBox.getChildren().add(icon);
-        }
-        for (int i = full + (hasHalf ? 1 : 0); i < 5; i++) {
-            FontIcon icon = new FontIcon("far-star");
-            icon.setStyle("-fx-font-size: 19px; -fx-icon-color: white;");
-            starBox.getChildren().add(icon);
-        }
-        return starBox;
+        for (int i = 0; i < full; i++) box.getChildren().add(createStar("fas-star"));
+        if (half) box.getChildren().add(createStar("fas-star-half-alt"));
+        for (int i = full + (half ? 1 : 0); i < 5; i++) box.getChildren().add(createStar("far-star"));
+
+        return box;
     }
 
-    /**
-     * Hiệu ứng hiển thị chi tiết phim.
-     * Bắt đầu từ bên phải và trượt vào.
-     */
+    // Create a star icon with specific style
+    private FontIcon createStar(String iconLiteral) {
+        FontIcon icon = new FontIcon(iconLiteral);
+        icon.setStyle("-fx-font-size: 19px; -fx-icon-color: white;");
+        return icon;
+    }
+
+    // Animate the showing of the movie detail container
     private void animateShowMovieDetail() {
         movieDetailContainer.setVisible(true);
-        movieDetailContainer.setTranslateX(movieDetailContainer.getWidth()); // Bắt đầu bên phải
-        TranslateTransition slideIn = new TranslateTransition(Duration.millis(300), movieDetailContainer);
-        slideIn.setFromX(movieDetailContainer.getWidth());
-        slideIn.setToX(0);
-        slideIn.play();
+        movieDetailContainer.setTranslateX(movieDetailContainer.getWidth());
+        TranslateTransition slide = new TranslateTransition(Duration.millis(300), movieDetailContainer);
+        slide.setFromX(movieDetailContainer.getWidth());
+        slide.setToX(0);
+        slide.play();
     }
 
-    /**
-     * Hiệu ứng ẩn chi tiết phim.
-     * Trượt ra bên phải.
-     */
+    // Animate the hiding of the movie detail container
     public void animateHideMovieDetail() {
-        TranslateTransition slideOut = new TranslateTransition(Duration.millis(300), movieDetailContainer);
-        slideOut.setFromX(0);
-        slideOut.setToX(movieDetailContainer.getWidth());
-        slideOut.setOnFinished(e -> movieDetailContainer.setVisible(false));
-        slideOut.play();
+        TranslateTransition slide = new TranslateTransition(Duration.millis(300), movieDetailContainer);
+        slide.setFromX(0);
+        slide.setToX(movieDetailContainer.getWidth());
+        slide.setOnFinished(e -> movieDetailContainer.setVisible(false));
+        slide.play();
     }
 
+    // Add a person to the list of directors, producers, or genres
     private void addPersontoList(VBox list, String name) {
         Label label = new Label(name);
         label.setStyle("-fx-text-fill: white; -fx-font-size: 14px;");
         list.getChildren().add(label);
     }
 
+    // Create a card for each actor with their name and image
     private void actorCard(String name, ImageView image) {
-        // Tạo label tên diễn viên
         Label label = new Label(name);
         label.setStyle("-fx-text-fill: white; -fx-font-size: 15px;");
 
-        // Tạo ảnh với clip bo góc
-        ImageView actorImage = new ImageView(image.getImage());
+        ImageView actorImage = image;
         actorImage.setFitWidth(150);
         actorImage.setFitHeight(150);
-
         Rectangle clip = new Rectangle(150, 150);
         clip.setArcWidth(20);
         clip.setArcHeight(20);
         actorImage.setClip(clip);
 
-        // Tạo VBox chứa ảnh và tên
-        VBox actorBox = new VBox(actorImage, label);
-        actorBox.setSpacing(10);
-        actorBox.setAlignment(Pos.CENTER);
-        actorBox.setPrefWidth(180);
-        actorBox.setStyle(
-                "-fx-background-color: #2c2f3a;" +
-                        "-fx-background-radius: 15;" +
-                        "-fx-border-radius: 15;"
-        );
-        // Tạo hiệu ứng bóng (DropShadow)
-        DropShadow shadow = new DropShadow();
-        shadow.setRadius(10);
-        shadow.setOffsetX(4); // bóng phải
-        shadow.setOffsetY(4); // bóng dưới
-        shadow.setColor(Color.rgb(0, 0, 0, 0.6)); // bóng màu đen, mờ
-        actorBox.setEffect(shadow);
+        VBox box = new VBox(actorImage, label);
+        box.setSpacing(10);
+        box.setAlignment(Pos.CENTER);
+        box.setPrefWidth(180);
+        box.setStyle("-fx-background-color: #2c2f3a; -fx-background-radius: 15; -fx-border-radius: 15;");
 
-        // Thêm vào danh sách
-        actorContainerList.getChildren().add(actorBox);
+        DropShadow shadow = new DropShadow(10, 4, 4, Color.rgb(0, 0, 0, 0.6));
+        box.setEffect(shadow);
+
+        actorContainerList.getChildren().add(box);
     }
-
 }
